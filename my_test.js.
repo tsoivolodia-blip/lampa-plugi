@@ -1,0 +1,42 @@
+(function () {
+    'use strict';
+
+    function startPlugin() {
+        // Ждем, когда Lampa полностью загрузится
+        Lampa.Listener.follow('app', function (e) {
+            if (e.type == 'ready') {
+                
+                // Слушаем открытие карточки фильма (раздел 'full')
+                Lampa.Listener.follow('full', function (event) {
+                    if (event.type == 'complite') {
+                        console.log('Карточка открыта:', event.data.movie.title);
+
+                        // 1. Создаем саму кнопку
+                        // class="full-start__button selector" — это стандартные стили Lampa
+                        var myButton = $(`<div class="full-start__button selector">
+                            <svg height="36" viewBox="0 0 24 24" width="36" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" fill="white"/></svg>
+                            <span>ТЕСТ КНОПКА</span>
+                        </div>`);
+
+                        // 2. Что делать при нажатии (Enter на пульте или тап на телефоне)
+                        myButton.on('hover:enter', function () {
+                            Lampa.Noty.show('Кнопка нажата для: ' + event.data.movie.title);
+                        });
+
+                        // 3. Добавляем кнопку в блок с кнопками в карточке
+                        event.object.container.find('.full-start__buttons').append(myButton);
+                    }
+                });
+
+            }
+        });
+    }
+
+    // Запуск скрипта
+    if (window.appready) startPlugin();
+    else {
+        Lampa.Listener.follow('app', function (e) {
+            if (e.type == 'ready') startPlugin();
+        });
+    }
+})();
